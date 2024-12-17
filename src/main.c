@@ -5,7 +5,8 @@
 наилучшего и наихудшего вариантов последовательностей
 */
 #include <assert.h> /*asset()*/
-#include <malloc.h> /*malloc()*/
+#include <time.h> /*time()*/
+#include <stdlib.h> /*atoi(), malloc()*/
 #include <stdio.h>  /*printf()*/
 #include <string.h> /*memmove()*/
 
@@ -70,6 +71,12 @@ static int ShellSort(void * const p,
 	return 0;
 }
 
+void RandomiseArr(int * arr, int size)
+{
+	for (int i = 0; i < size; ++i)
+		arr[i] = rand();
+}
+
 void PrintArr(int * arr, int size)
 {
 	for (int i = 0; i < size; ++i)
@@ -77,14 +84,22 @@ void PrintArr(int * arr, int size)
 	putchar('\n');
 }
 
-int main()
+int main(int const argc, char const *const args[])
 {
-	int nn[] = {1, 9, 0, -1, -3, 4, -3, 1};
-	PrintArr(nn, 8);
-	if (ShellSort(nn, 8, 4, SortDescInt))
+	srand((unsigned int)time(NULL));
+	int elCount = (argc > 1) ? atoi(args[1]) : 0; 
+	if (elCount < 1)
+		elCount = 1000;
+	int *nn = (int *)malloc(sizeof(int) * (size_t)elCount);
+	if (!nn)
+		return 1;
+	RandomiseArr(nn, elCount);
+
+	PrintArr(nn, elCount);
+	if (ShellSort(nn, (size_t)elCount, sizeof(int), SortDescInt))
 		return 1;
 
-	PrintArr(nn, 8);
+	PrintArr(nn, elCount);
 	printf("%d сравнений, %d перестановок\n", CompCount, SwapCount);
 	return 0;
 }
