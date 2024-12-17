@@ -5,26 +5,17 @@
 наилучшего и наихудшего вариантов последовательностей
 */
 #include <assert.h> /*asset()*/
-#include <malloc.h>
+#include <malloc.h> /*malloc()*/
 #include <stdio.h>  /*printf()*/
 #include <string.h> /*memmove()*/
 
-// #include <stdlib.h>
-
-void Swap(void const * a, void const * b, size_t const m)
-{
-	for (size_t i = 0; i < m; ++i) {
-		a += i, b += i;
-		char tmp = *(char *)a;
-		*(char *)a = *(char *)b;
-		*(char *)b = tmp;
-	}
-}
+int CompCount, SwapCount;
 
 int SortAscInt(void const * a, void const * b)
 {
 	int const n = *((int *)a);
 	int const m = *((int *)b);
+	++CompCount;
 
 	/*Если первый аргумент больше второго -- возврат +1*/
 	/*Если второй аргумент больше первого -- возврат -1*/
@@ -36,6 +27,7 @@ int SortDescInt(void const * a, void const * b)
 {
 	int const n = *((int *)a);
 	int const m = *((int *)b);
+	++CompCount;
 
 	/*Если первый аргумент меньше второго -- возврат +1*/
 	/*Если второй аргумент меньше первого -- возврат -1*/
@@ -59,16 +51,18 @@ static int ShellSort(void * const p,
 				return 1;
 			memcpy(temp, p + i * size, size);
 
-			/**/
 			size_t j;
 			for (j = i;
 			     j >= gap && compar(p + (j - gap) * size, temp) > 0;
 			     j -= gap) {
 				memmove(p + j * size, p + (j - gap) * size,
 					size);
+				++SwapCount;
 			}
 
 			/*Устновка элемента temp (i-го) в нужное место*/
+			if (p + j * size != p + i * size)
+				++SwapCount;
 			memmove(p + j * size, temp, size);
 			free(temp);
 		}
@@ -87,10 +81,10 @@ int main()
 {
 	int nn[] = {1, 9, 0, -1, -3, 4, -3, 1};
 	PrintArr(nn, 8);
-	if (!ShellSort(nn, 8, 4, SortDescInt)) {
-		PrintArr(nn, 8);
-		return 0;
-	} else {
+	if (ShellSort(nn, 8, 4, SortDescInt))
 		return 1;
-	};
+
+	PrintArr(nn, 8);
+	printf("%d сравнений, %d перестановок\n", CompCount, SwapCount);
+	return 0;
 }
