@@ -4,8 +4,22 @@
 Сравнить их эффективность (число сравнений и перестановок) для
 наилучшего и наихудшего вариантов последовательностей
 */
-#include <stdio.h>
-#include <stdlib.h>
+#include <assert.h> /*asset()*/
+#include <malloc.h>
+#include <stdio.h>  /*printf()*/
+#include <string.h> /*memmove()*/
+
+// #include <stdlib.h>
+
+void Swap(void const * a, void const * b, size_t const m)
+{
+	for (size_t i = 0; i < m; ++i) {
+		a += i, b += i;
+		char tmp = *(char *)a;
+		*(char *)a = *(char *)b;
+		*(char *)b = tmp;
+	}
+}
 
 int SortAscInt(void const * a, void const * b)
 {
@@ -29,17 +43,54 @@ int SortDescInt(void const * a, void const * b)
 	return (n < m) - (m < n);
 }
 
-// static void ShellSort(void * const p,
-//		      size_t const size,
-//		      size_t nmemb,
-//		      int (*compar)(void * const, void * const))
-//{
-// }
+/*Сортировка Шелла. Возврат 1 при ошибке выделения памяти, 0 при успехе*/
+static int ShellSort(void * const p,
+		     size_t const nmemb,
+		     size_t const size,
+		     int (*compar)(void const *, void const *))
+{
+	/* Начальный промежуток -- половина массива,
+	 * каждый шаг промежуток уменьшается в 2 раза */
+	for (size_t gap = nmemb / 2; gap > 0; gap /= 2) {
+		for (size_t i = gap; i < nmemb; ++i) {
+			/*Сохранение i-го элемента в буфер*/
+			void * temp = malloc(size);
+			if (!temp)
+				return 1;
+			memcpy(temp, p + i * size, size);
+
+			/**/
+			size_t j;
+			for (j = i;
+			     j >= gap && compar(p + (j - gap) * size, temp) > 0;
+			     j -= gap) {
+				memmove(p + j * size, p + (j - gap) * size,
+					size);
+			}
+
+			/*Устновка элемента temp (i-го) в нужное место*/
+			memmove(p + j * size, temp, size);
+			free(temp);
+		}
+	}
+	return 0;
+}
+
+void PrintArr(int * arr, int size)
+{
+	for (int i = 0; i < size; ++i)
+		printf("%d ", arr[i]);
+	putchar('\n');
+}
 
 int main()
 {
 	int nn[] = {1, 9, 0, -1, -3, 4, -3, 1};
-	qsort(nn, 8, 4, SortAscInt);
-	printf("Hello World!\n");
-	return 0;
+	PrintArr(nn, 8);
+	if (!ShellSort(nn, 8, 4, SortDescInt)) {
+		PrintArr(nn, 8);
+		return 0;
+	} else {
+		return 1;
+	};
 }
