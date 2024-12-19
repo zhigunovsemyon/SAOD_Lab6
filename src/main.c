@@ -11,9 +11,9 @@
 #include <time.h>   /*time()*/
 
 typedef char * byteptr; // Для арифметики с void указателями в MSVC
-int CompCount, SwapCount;
+static int CompCount, SwapCount;
 
-int SortAscInt(void const * a, void const * b)
+static int SortAscInt(void const * a, void const * b)
 {
 	int const n = *((int *)a);
 	int const m = *((int *)b);
@@ -25,7 +25,7 @@ int SortAscInt(void const * a, void const * b)
 	return (n > m) - (m > n);
 }
 
-int SortDescInt(void const * a, void const * b)
+static int SortDescInt(void const * a, void const * b)
 {
 	int const n = *((int *)a);
 	int const m = *((int *)b);
@@ -73,13 +73,13 @@ static int ShellSort(void * const p,
 	return 0;
 }
 
-void RandomiseArr(int * arr, int size)
+static void RandomiseArr(int * arr, int size)
 {
 	for (int i = 0; i < size; ++i)
 		arr[i] = rand();
 }
 
-void PrintArr(int * arr, int size)
+static void PrintArr(int * arr, int size)
 {
 	for (int i = 0; i < size; ++i)
 		printf("%d ", arr[i]);
