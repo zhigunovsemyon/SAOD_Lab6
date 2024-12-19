@@ -5,11 +5,12 @@
 наилучшего и наихудшего вариантов последовательностей
 */
 #include <assert.h> /*asset()*/
-#include <time.h> /*time()*/
-#include <stdlib.h> /*atoi(), malloc()*/
 #include <stdio.h>  /*printf()*/
+#include <stdlib.h> /*atoi(), malloc()*/
 #include <string.h> /*memmove()*/
+#include <time.h>   /*time()*/
 
+typedef char * byteptr; // Для арифметики с void указателями в MSVC
 int CompCount, SwapCount;
 
 int SortAscInt(void const * a, void const * b)
@@ -50,21 +51,22 @@ static int ShellSort(void * const p,
 			void * temp = malloc(size);
 			if (!temp)
 				return 1;
-			memcpy(temp, p + i * size, size);
+			memcpy(temp, (byteptr)p + i * size, size);
 
 			size_t j;
 			for (j = i;
-			     j >= gap && compar(p + (j - gap) * size, temp) > 0;
+			     j >= gap &&
+			     compar((byteptr)p + (j - gap) * size, temp) > 0;
 			     j -= gap) {
-				memmove(p + j * size, p + (j - gap) * size,
-					size);
+				memmove((byteptr)p + j * size,
+					(byteptr)p + (j - gap) * size, size);
 				++SwapCount;
 			}
 
 			/*Устновка элемента temp (i-го) в нужное место*/
-			if (p + j * size != p + i * size)
+			if ((byteptr)p + j * size != (byteptr)p + i * size)
 				++SwapCount;
-			memmove(p + j * size, temp, size);
+			memmove((byteptr)p + j * size, temp, size);
 			free(temp);
 		}
 	}
@@ -84,13 +86,13 @@ void PrintArr(int * arr, int size)
 	putchar('\n');
 }
 
-int main(int const argc, char const *const args[])
+int main(int const argc, char const * const args[])
 {
 	srand((unsigned int)time(NULL));
-	int elCount = (argc > 1) ? atoi(args[1]) : 0; 
+	int elCount = (argc > 1) ? atoi(args[1]) : 0;
 	if (elCount < 1)
 		elCount = 1000;
-	int *nn = (int *)malloc(sizeof(int) * (size_t)elCount);
+	int * nn = (int *)malloc(sizeof(int) * (size_t)elCount);
 	if (!nn)
 		return 1;
 	RandomiseArr(nn, elCount);
